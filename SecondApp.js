@@ -14,6 +14,7 @@ const SecondPage = () => {
   const [cvv, setCvv] = useState('');
   const [expiryDate, setExpiryDate] = useState(new Date());
   const [modalVisible, setModalVisible] = useState(false);
+  const [cards, setCards] = useState([]);
 
   const switchPage = (page) => {
     setCurrentPage(page);
@@ -39,6 +40,14 @@ const SecondPage = () => {
         return (
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <Text>Kredi kartı bilgileri</Text>
+            {cards.map((card, index) => (
+              <View key={index}>
+                <Text>Kart Numarası: {card.cardNumber}</Text>
+                <Text>Kart Tipi: {card.cardType}</Text>
+                <Text>Son Kullanma Tarihi: {card.expiryDate.toLocaleDateString()}</Text>
+                <Text>CVV: {card.cvv}</Text>
+              </View>
+            ))}
           </View>
         );
       case 'Net Varlığım':
@@ -130,8 +139,18 @@ const SecondPage = () => {
   };
 
   const saveCard = () => {
-    // Kartı kaydetmek için gerekli işlemler buraya gelecek
-    console.log('Kart kaydedildi');
+    const newCard = {
+      cardNumber: cardNumber,
+      cardType: cardType,
+      cvv: cvv,
+      expiryDate: expiryDate
+    };
+    setCards([...cards, newCard]);
+    setCardNumber('');
+    setCardType('');
+    setCvv('');
+    setExpiryDate(new Date());
+    setIsAddingCard(false);
   };
 
   const detectCardType = (cardNumber) => {
