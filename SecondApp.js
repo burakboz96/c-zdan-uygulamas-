@@ -33,6 +33,8 @@ const SecondPage = () => {
   const [expiryDate, setExpiryDate] = useState(new Date());
   const [modalVisible, setModalVisible] = useState(false);
   const [cards, setCards] = useState([]);
+  const [contactFormVisible, setContactFormVisible] = useState(false);
+  const [contactMessage, setContactMessage] = useState('');
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -209,6 +211,19 @@ const SecondPage = () => {
     }
   };
 
+  const toggleContactForm = () => {
+    setContactFormVisible(!contactFormVisible);
+  };
+
+  const submitContactMessage = () => {
+    // Burada iletişim formundan alınan mesajı gönderme işlemi gerçekleştirilecek
+    console.log('Gönderilen Mesaj:', contactMessage);
+    // İletişim formunu kapat
+    setContactFormVisible(false);
+    // Mesajı sıfırla
+    setContactMessage('');
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flex: 2, backgroundColor: '#1E90FF', justifyContent: 'flex-start', alignItems: 'flex-start', paddingLeft: 25, paddingTop: 15 }}>
@@ -222,7 +237,7 @@ const SecondPage = () => {
             <MaterialIcons name="notifications" size={31} color="white" top={-24} />
             <Text style={{ fontSize: 24, color: '#000', marginRight: 45 }}> </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => console.log('İletişim iconuna tıklandı')}>
+          <TouchableOpacity onPress={toggleContactForm}>
             <Fontisto name="comment" size={24} color="white" top={-20} />
             <Text style={{ fontSize: 24, color: '#000', top: -24 }}></Text>
           </TouchableOpacity>
@@ -241,6 +256,23 @@ const SecondPage = () => {
       </View>
       {renderMenu()}
       {renderCardAdding()}
+      {contactFormVisible && (
+        <View style={{ position: 'absolute', top: '15%', left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#fff', padding: 35, borderRadius: 10 }}>
+            <TextInput
+              style={{ height: 130, width: 300, borderColor: 'gray', borderWidth: 1, marginBottom: 30 }}
+              multiline
+              onChangeText={text => setContactMessage(text)}
+              value={contactMessage}
+              placeholder="Şikayet ve önerilerinizi buraya yazın..."
+            />
+            <Button title="Gönder" onPress={submitContactMessage} />
+            <TouchableOpacity style={{ position: 'absolute', top: 10, right: 10 }} onPress={toggleContactForm}>
+              <AntDesign name="close" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
       <Modal
         animationType="slide"
         transparent={false}
