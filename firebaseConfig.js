@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 
+
 const firebaseConfig = {
   apiKey: "AIzaSyAWABMzjyrbtZNWgKAg1dF0x5r44a1ET7o",
   authDomain: "cuzdanapp-fe2fd.firebaseapp.com",
@@ -16,4 +17,4 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
 export { app, analytics };
-//veri tabanı yolları 
+ 
