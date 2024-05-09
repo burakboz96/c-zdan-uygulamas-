@@ -7,6 +7,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { getFirestore, collection, addDoc, query, getDocs } from 'firebase/firestore';
+import { Linking } from 'react-native';
+import RNExitApp from 'react-native-exit-app';
 
 // Firebase yapılandırma
 const firebaseConfig = {
@@ -101,12 +103,12 @@ const SecondPage = () => {
     if (isMenuOpen) {
       return (
         <View style={{ backgroundColor: '#000000', width: 320, height: '330%', position: 'absolute', top: 110, left: 0 ,zIndex:100 }}>
-          <Button class="boyut" title="ÖDEMELER" onPress={() => console.log('A pressed')} />
-          <Button class="boyut" title="KREDİLER" onPress={() => console.log('B pressed')} />
-          <Button class="boyut" title="DÖVİZ VE ALTIN" onPress={() => console.log('C pressed')} />
-          <Button class="boyut" title="AÇIK BANKACILIK İŞLEMLERİ" onPress={() => console.log('D pressed')} />
-          <Button class="boyut" title="KART AYARLARI" onPress={() => console.log('E pressed')} />
-          <Button class="boyut" title="GÜVENLİ ÇIKIŞ" onPress={() => console.log('F pressed')} />
+          <Button class="boyut" title="ÖDEMELER" onPress={() =>Linking.openURL('https://www.ziraatbank.com.tr/tr/bireysel/odemeler')} />
+          <Button class="boyut" title="KREDİLER" onPress={() => Linking.openURL('https://www.hangikredi.com/kredi/ihtiyac-kredisi/sorgulama')} />
+          <Button class="boyut" title="DÖVİZ VE ALTIN" onPress={() => Linking.openURL('https://tr.investing.com/currencies/xau-usd')} />
+          <Button class="boyut" title="AÇIK BANKACILIK İŞLEMLERİ" onPress={() => Linking.openURL('https://www.ziraatbank.com.tr/tr/sss/dijital-bankacilik/acik-bankacilik')} />
+          <Button class="boyut" title="CÜZDAN UYGULAMASI HAKKINDA" onPress={() => Linking.openURL('https://www.ideasoft.com.tr/dijital-cuzdan-nedir-nasil-kullanilir/')} />
+          <Button class="boyut" title="GÜVENLİ ÇIKIŞ" onPress={() => RNExitApp.exitApp()} />
         </View>
       );
     } else {
