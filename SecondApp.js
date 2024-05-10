@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Button, TextInput, Modal, Image, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, Button, TextInput, Modal, Image, FlatList, Linking } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
@@ -7,10 +7,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { getFirestore, collection, addDoc, query, getDocs } from 'firebase/firestore';
-import { Linking } from 'react-native';
-import RNExitApp from 'react-native-exit-app';
 
-// Firebase yapılandırma
 const firebaseConfig = {
   apiKey: "AIzaSyAWABMzjyrbtZNWgKAg1dF0x5r44a1ET7o",
   authDomain: "cuzdanapp-fe2fd.firebaseapp.com",
@@ -23,7 +20,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-const db = getFirestore(app); // Firestore bağlantısı
+const db = getFirestore(app);
 
 const SecondPage = () => {
   const [currentPage, setCurrentPage] = useState('Hesabım');
@@ -35,6 +32,10 @@ const SecondPage = () => {
   const [expiryDate, setExpiryDate] = useState(new Date());
   const [modalVisible, setModalVisible] = useState(false);
   const [cards, setCards] = useState([]);
+  const [contactFormVisible, setContactFormVisible] = useState(false);
+  const [contactMessage, setContactMessage] = useState('');
+  const [assets, setAssets] = useState([]);
+  const [debts, setDebts] = useState([]);
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -49,6 +50,29 @@ const SecondPage = () => {
 
     fetchCards();
   }, []);
+
+  useEffect(() => {
+    const fetchAssetsAndDebts = async () => {
+      const assetsCollection = collection(db, 'assets');
+      const debtsCollection = collection(db, 'debts');
+      const assetsSnapshot = await getDocs(assetsCollection);
+      const debtsSnapshot = await getDocs(debtsCollection);
+      const fetchedAssets = [];
+      const fetchedDebts = [];
+      assetsSnapshot.forEach((doc) => {
+        fetchedAssets.push({ id: doc.id, ...doc.data() });
+      });
+      debtsSnapshot.forEach((doc) => {
+        fetchedDebts.push({ id: doc.id, ...doc.data() });
+      });
+      setAssets(fetchedAssets);
+      setDebts(fetchedDebts);
+    };
+
+    if (currentPage === 'Net Varlığım') {
+      fetchAssetsAndDebts();
+    }
+  }, [currentPage]);
 
   const switchPage = (page) => {
     setCurrentPage(page);
@@ -91,7 +115,26 @@ const SecondPage = () => {
       case 'Net Varlığım':
         return (
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>Grafik</Text>
+            <Text>Varlıklar</Text>
+            <FlatList
+              data={assets}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View>
+                  <Text>{item.assets}</Text>
+                </View>
+              )}
+            />
+            <Text>Borçlar</Text>
+            <FlatList
+              data={debts}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View>
+                  <Text>{item.debts}</Text>
+                </View>
+              )}
+            />
           </View>
         );
       default:
@@ -115,6 +158,7 @@ const SecondPage = () => {
       return null;
     }
   };
+
 
   const renderCardAdding = () => {
     if (isAddingCard) {
@@ -211,6 +255,19 @@ const SecondPage = () => {
     }
   };
 
+  const toggleContactForm = () => {
+    setContactFormVisible(!contactFormVisible);
+  };
+
+  const submitContactMessage = () => {
+    // Burada iletişim formundan alınan mesajı gönderme işlemi gerçekleştirilecek
+    console.log('Gönderilen Mesaj:', contactMessage);
+    // İletişim formunu kapat
+    setContactFormVisible(false);
+    // Mesajı sıfırla
+    setContactMessage('');
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flex: 2, backgroundColor: '#1E90FF', justifyContent: 'flex-start', alignItems: 'flex-start', paddingLeft: 25, paddingTop: 15 }}>
@@ -224,7 +281,7 @@ const SecondPage = () => {
             <MaterialIcons name="notifications" size={31} color="white" top={-24} />
             <Text style={{ fontSize: 24, color: '#000', marginRight: 45 }}> </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => console.log('İletişim iconuna tıklandı')}>
+          <TouchableOpacity onPress={toggleContactForm}>
             <Fontisto name="comment" size={24} color="white" top={-20} />
             <Text style={{ fontSize: 24, color: '#000', top: -24 }}></Text>
           </TouchableOpacity>
@@ -243,6 +300,23 @@ const SecondPage = () => {
       </View>
       {renderMenu()}
       {renderCardAdding()}
+      {contactFormVisible && (
+        <View style={{ position: 'absolute', top: '15%', left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#fff', padding: 35, borderRadius: 10 }}>
+            <TextInput
+              style={{ height: 130, width: 300, borderColor: 'gray', borderWidth: 1, marginBottom: 30 }}
+              multiline
+              onChangeText={text => setContactMessage(text)}
+              value={contactMessage}
+              placeholder="Şikayet ve önerilerinizi buraya yazın..."
+            />
+            <Button title="Gönder" onPress={submitContactMessage} />
+            <TouchableOpacity style={{ position: 'absolute', top: 10, right: 10 }} onPress={toggleContactForm}>
+              <AntDesign name="close" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
       <Modal
         animationType="slide"
         transparent={false}
