@@ -275,5 +275,7 @@ const styles = StyleSheet.create({
     marginVertical: 7,
     borderRadius: 5,
     left:0,
+
+  
   },
 });

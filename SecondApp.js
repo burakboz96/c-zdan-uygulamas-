@@ -32,10 +32,6 @@ const SecondPage = () => {
   const [expiryDate, setExpiryDate] = useState(new Date());
   const [modalVisible, setModalVisible] = useState(false);
   const [cards, setCards] = useState([]);
-  const [contactFormVisible, setContactFormVisible] = useState(false);
-  const [contactMessage, setContactMessage] = useState('');
-  const [assets, setAssets] = useState([]);
-  const [debts, setDebts] = useState([]);
 
   useEffect(() => {
     const fetchCards = async () => {
