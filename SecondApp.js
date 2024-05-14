@@ -7,6 +7,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { getFirestore, collection, addDoc, query, getDocs } from 'firebase/firestore';
+import { BackHandler, Platform } from 'react-native';
+import Zocial from '@expo/vector-icons/Zocial';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAWABMzjyrbtZNWgKAg1dF0x5r44a1ET7o",
@@ -32,6 +34,10 @@ const SecondPage = () => {
   const [expiryDate, setExpiryDate] = useState(new Date());
   const [modalVisible, setModalVisible] = useState(false);
   const [cards, setCards] = useState([]);
+  const [contactFormVisible, setContactFormVisible] = useState(false);
+  const [contactMessage, setContactMessage] = useState('');
+  const [assets, setAssets] = useState([]);
+  const [debts, setDebts] = useState([]);
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -108,31 +114,31 @@ const SecondPage = () => {
             />
           </View>
         );
-      case 'Net Varlığım':
-        return (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>Varlıklar</Text>
-            <FlatList
-              data={assets}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View>
-                  <Text>{item.assets}</Text>
-                </View>
-              )}
-            />
-            <Text>Borçlar</Text>
-            <FlatList
-              data={debts}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View>
-                  <Text>{item.debts}</Text>
-                </View>
-              )}
-            />
-          </View>
-        );
+        case 'Net Varlığım':
+          return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <Text>Varlıklar</Text>
+              <FlatList
+                data={assets}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <View>
+                    <Text>{item.assets}</Text>
+                  </View>
+                )}
+              />
+              <Text>Borçlar</Text>
+              <FlatList
+                data={debts}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <View>
+                    <Text>{item.debts}</Text>
+                  </View>
+                )}
+              /> 
+            </View>
+          );
       default:
         return null;
     }
@@ -264,6 +270,17 @@ const SecondPage = () => {
     setContactMessage('');
   };
 
+  const exitApp = () => {
+    if (Platform.OS === 'android') {
+      BackHandler.exitApp();
+    } else {
+      // iOS'ta uygulamayı kapatma işlemi
+      // Örneğin, bu işlem için NativeModules kullanılabilir.
+      // Bu örnekte iOS için bir işlem eklenmedi.
+      console.log('Uygulamadan çıkılıyor...');
+    }
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flex: 2, backgroundColor: '#1E90FF', justifyContent: 'flex-start', alignItems: 'flex-start', paddingLeft: 25, paddingTop: 15 }}>
@@ -343,6 +360,14 @@ const SecondPage = () => {
           <Text style={{ color: 'blue' }}>Kartı Kaydet</Text>
         </TouchableOpacity>
       </View>
+      {/* Güvenli çıkış butonu */}
+      <TouchableOpacity onPress={exitApp} style={{ position: 'absolute', top: 20, right: 110 }}>
+        <AntDesign name="logout" size={24} color="white" />
+      </TouchableOpacity>
+      {/* Telefon numaralarını gösterme */}
+      <TouchableOpacity onPress={() => Linking.openURL('tel:05522760562')} style={{ position: 'absolute', top: 645, right: 350 }}>
+      <Zocial name="call" size={43} color="green" />
+      </TouchableOpacity>
     </View>
   );
 };
