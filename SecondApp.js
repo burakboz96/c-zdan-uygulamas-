@@ -9,6 +9,9 @@ import { getAnalytics } from 'firebase/analytics';
 import { getFirestore, collection, addDoc, query, getDocs } from 'firebase/firestore';
 import { BackHandler, Platform } from 'react-native';
 import Zocial from '@expo/vector-icons/Zocial';
+import { doc, deleteDoc } from 'firebase/firestore';
+import { Alert } from 'react-native';
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAWABMzjyrbtZNWgKAg1dF0x5r44a1ET7o",
@@ -39,6 +42,88 @@ const SecondPage = () => {
   const [assets, setAssets] = useState([]);
   const [debts, setDebts] = useState([]);
 
+  // Önce, güncelleme için bir state tanımlayalım
+const [selectedCard, setSelectedCard] = useState(null);
+
+// Ardından, güncelleme işlevini tanımlayalım
+const updateCard = (card) => {
+  setSelectedCard(card); // Seçili kartı güncelleme ekranı için ayarla
+};
+
+// Düzenleme ekranını render etmek için bir fonksiyon oluşturalım
+const renderEditScreen = () => {
+  if (selectedCard) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Düzenleme Ekranı</Text>
+        {/* Düzenleme formunu buraya ekleyin */}
+      </View>
+    );
+  } else {
+    return null;
+  }
+};
+
+// Ana bileşende render edilen yerde, düzenleme ekranını ekleyelim
+{renderEditScreen()}
+
+// EditScreen bileşeninde, kartı güncelleme formunu ekleyelim
+const EditScreen = () => {
+  const [editedCardNumber, setEditedCardNumber] = useState(selectedCard.cardNumber);
+  const [editedCardType, setEditedCardType] = useState(selectedCard.cardType);
+  const [editedCvv, setEditedCvv] = useState(selectedCard.cvv);
+  const [editedExpiryDate, setEditedExpiryDate] = useState(new Date(selectedCard.expiryDate));
+
+  const saveEditedCard = async () => {
+    const editedCard = {
+      cardNumber: editedCardNumber,
+      cardType: editedCardType,
+      cvv: editedCvv,
+      expiryDate: editedExpiryDate.toLocaleDateString()
+    };
+
+    try {
+      // Firestore'da kartı güncelle
+      // Örneğin: await updateDoc(doc(db, 'cards', selectedCard.id), editedCard);
+      console.log('Kart başarıyla güncellendi:', editedCard);
+      setSelectedCard(null); // Seçili kartı sıfırla
+    } catch (error) {
+      console.error('Kartı güncellerken hata oluştu:', error);
+    }
+  };
+
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Kart Numarası</Text>
+      <TextInput
+        value={editedCardNumber}
+        onChangeText={(text) => setEditedCardNumber(text)}
+      />
+      {/* Diğer düzenlenebilir kart alanlarını ekleyin */}
+      <Button title="Kaydet" onPress={saveEditedCard} />
+    </View>
+  );
+};
+
+
+
+
+
+  const deleteCard = async (id) => {
+    try {
+      // Firestore'dan kartı sil
+      await deleteDoc(doc(db, 'cards', id));
+      
+      // State'den kartı sil
+      setCards(cards.filter(card => card.id !== id));
+      
+      // Kullanıcıya başarılı mesajı göster
+      Alert.alert('Başarılı', 'Kart başarıyla silindi.');
+    } catch (error) {
+      console.error('Kart silinirken hata oluştu:', error);
+      Alert.alert('Hata', 'Kart silinirken bir hata oluştu.');
+    }
+  };
   useEffect(() => {
     const fetchCards = async () => {
       const cardsCollection = collection(db, 'cards');
@@ -109,6 +194,19 @@ const SecondPage = () => {
                   <Text>Kart Tipi: {item.cardType}</Text>
                   <Text>Son Kullanma Tarihi: {item.expiryDate}</Text>
                   <Text>CVV: {item.cvv}</Text>
+                  <TouchableOpacity onPress={() => deleteCard(item.id)}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 8 }}>
+                    <MaterialIcons name="delete" size={24} color="red" />
+                    <Text style={{ color: 'red', marginLeft: 8 }}>Kartı Sil</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => updateCard(item)}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: -18 }}>
+                  <MaterialIcons name="edit" size={24} color="blue" />
+                 <Text style={{ color: 'green', marginLeft: 8 }}>Kartı Güncelle</Text>
+                 </View>
+                </TouchableOpacity>
+
                 </View>
               )}
             />
